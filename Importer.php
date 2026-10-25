@@ -30,6 +30,7 @@ class Importer
         $stage = \Piwik\Piwik::translate('NeorGoogleKeywords_StageStart');
         $date = $from;
         try {
+            $this->client->setSite($id);
             $this->repository->log($id, \Piwik\Piwik::translate('NeorGoogleKeywords_ImportStarted', [$from, $to]), $context + ['status' => 'info']);
             for ($d = $a; $d <= $b; $d = $d->modify('+1 day')) {
                 $date = $d->format('Y-m-d');

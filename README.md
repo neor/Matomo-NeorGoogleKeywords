@@ -1,4 +1,4 @@
-# NeorGoogleKeywords 1.1.1
+# NeorGoogleKeywords 1.2.0
 
 [![Matomo](https://img.shields.io/badge/Matomo-%3E%3D5.14.0%20%3C6-orange)](https://matomo.org/)
 [![PHP](https://img.shields.io/badge/PHP-%3E%3D8.1-777bb4)](https://php.net/)
@@ -70,6 +70,26 @@ property_1 = "sc-domain:example.com"
 
 The suffix in `property_1` is the **Matomo website ID**. For a URL-prefix property, use its exact URL, such as `https://www.example.org/`. Each mapping imports the entire Search Console property.
 
+### Separate service accounts for each website
+
+Use `credentials_file_ID` to give each website its own JSON key, where `ID` matches its `property_ID` entry:
+
+```ini
+[NeorGoogleKeywords]
+credentials_file_10 = "/etc/matomo-secrets/website-ten.json"
+property_10 = "https://first.example.com/"
+
+credentials_file_7 = "/etc/matomo-secrets/website-seven.json"
+property_7 = "https://second.example.com/"
+
+credentials_file_1 = "/etc/matomo-secrets/website-one.json"
+property_1 = "sc-domain:example.org"
+```
+
+Add each service account's `client_email` only to the Search Console property it should access. Enable the Search Console API in each account's Google Cloud project. Connection checks, manual imports, CLI imports and scheduled tasks all use the selected website's key. **Settings** displays that website's effective key path and service account.
+
+The original `credentials_file` remains supported as a shared fallback for websites without a `credentials_file_ID` entry. You can mix shared and individual keys. Do not repeat `credentials_file` for different websites. An explicitly configured but empty, invalid or unreadable website key causes an error; the plugin does not silently use the shared account instead.
+
 On Windows, use an existing local path such as `C:/private/google-search-console.json`. Never include the key in Git or release archives.
 
 Open **Google Search → Import → Test connection** to verify access.
@@ -79,7 +99,7 @@ Open **Google Search → Import → Test connection** to verify access.
 The web form imports up to **7 days** at a time. For historical data or large websites, use the CLI:
 
 ```bash
-php console neor-gkeys:import --idsite=1 --from=2026-09-01 --to=2026-09-30
+php console ngk:import --idsite=1 --from=2026-09-01 --to=2026-09-30
 ```
 
 Replace the example dates. The CLI accepts up to 500 days per invocation; omitting `--to` uses today minus two days in Google's timezone. Reimporting safely replaces existing daily data.

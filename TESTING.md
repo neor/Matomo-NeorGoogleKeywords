@@ -1,3 +1,9 @@
+# Per-website credentials (1.2.0) — 2026-10-25
+
+All nine standalone test scripts passed on PHP 8.4.27 after adding per-website JSON keys. The expanded credentials test uses temporary synthetic files and a generated test signing key with mocked HTTP responses; it performs no Google API or database calls. It verifies site-specific selection, shared-key fallback, compatibility for callers without a website ID, invalid overrides without silent fallback, configuration with no shared key, token reuse within one site, token isolation when switching sites, and sequential cron-source imports using one reusable client with different site accounts.
+
+All five changed PHP files passed `php -l`, and `git diff --check` passed. DDEV, PHPCS and PHPStan were unavailable. Live Google authorization, database integration and browser verification were not performed. No schema changes are required.
+
 # Additional interface languages — 2026-10-25
 
 Added direct translations for this custom plugin in French (`fr`), Spanish (`es`), Portuguese (`pt`), German (`de`) and Italian (`it`). Each new catalog contains all 223 English source keys with compatible placeholders and unchanged technical parameter names. No evidence of Weblate management was found in the plugin files or translation history.

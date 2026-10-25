@@ -29,9 +29,18 @@ final class Settings
         return $property;
     }
 
-    public static function credentials(): array
+    public static function credentialsFile(?int $idSite = null): string
     {
-        $file = self::all()['credentials_file'] ?? '';
+        $settings = self::all();
+        $siteKey = 'credentials_file_' . $idSite;
+        $file = $idSite !== null && array_key_exists($siteKey, $settings)
+            ? $settings[$siteKey] : ($settings['credentials_file'] ?? '');
+        return is_string($file) ? $file : '';
+    }
+
+    public static function credentials(?int $idSite = null): array
+    {
+        $file = self::credentialsFile($idSite);
         $normalize = static fn(string $path): string => DIRECTORY_SEPARATOR === '\\'
             ? strtolower(str_replace('\\', '/', $path)) : $path;
         $normalizedFile = is_string($file) ? $normalize($file) : '';

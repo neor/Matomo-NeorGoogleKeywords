@@ -5,6 +5,17 @@ class GoogleClient
 {
     private string $token = '';
     private int $expires = 0;
+    private ?int $idSite = null;
+
+    public function setSite(int $idSite): void
+    {
+        if ($this->idSite !== $idSite) {
+            // A token must not carry over to another website's service account.
+            $this->idSite = $idSite;
+            $this->token = '';
+            $this->expires = 0;
+        }
+    }
 
     public static function version(): string
     {
@@ -81,7 +92,7 @@ class GoogleClient
         if ($this->expires > time() + 60) {
             return $this->token;
         }
-        $key = Settings::credentials();
+        $key = Settings::credentials($this->idSite);
         $now = time();
         $header = self::base64url(json_encode(['alg' => 'RS256', 'typ' => 'JWT'], JSON_THROW_ON_ERROR));
         $claims = self::base64url(json_encode([

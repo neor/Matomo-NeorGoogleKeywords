@@ -79,7 +79,26 @@ The number in `property_1` is the **Matomo website ID**, not the Google Cloud pr
 property_1 = "https://www.example.com/"
 ```
 
-You can connect multiple websites in the same section by adding `property_2`, `property_10` and other Matomo IDs. The service account must have access to each configured property.
+You can connect multiple websites in the same section by adding `property_2`, `property_10` and other Matomo IDs. With a shared `credentials_file`, the service account must have access to every configured property.
+
+### Use a different JSON key for each website
+
+If you manage websites through separate Google Cloud projects or service accounts, repeat steps 1–5 for each account and store each JSON key outside all public web directories. Starting with version 1.2.0, you can map these files to Matomo website IDs:
+
+```ini
+[NeorGoogleKeywords]
+credentials_file_10 = "/etc/matomo-secrets/website-ten.json"
+property_10 = "https://first.example.com/"
+
+credentials_file_7 = "/etc/matomo-secrets/website-seven.json"
+property_7 = "https://second.example.com/"
+```
+
+The suffix in `credentials_file_7` and `property_7` refers to the same Matomo website. Grant that key's `client_email` access to its corresponding Search Console property, and enable the Search Console API in that key's Google Cloud project.
+
+You may keep a single `credentials_file` as a fallback for websites without their own key entry. Do not repeat the same `credentials_file` setting for multiple accounts. If an individual key entry exists but is invalid, the plugin reports an error rather than falling back to another account.
+
+The **Settings** page shows the effective file, project and service account for the selected website. Test the connection for each website before running imports. The same mapping applies to both manual and scheduled imports.
 
 ## 7. Test the connection and import
 

@@ -153,7 +153,9 @@ class Controller extends \Piwik\Plugin\Controller
                 $authorizedPost = true;
                 $operation = $this->input('operation', '', true);
                 if ($operation === 'test') {
-                    $v['ngkProperties'] = (new GoogleClient())->properties();
+                    $client = new GoogleClient();
+                    $client->setSite($id);
+                    $v['ngkProperties'] = $client->properties();
                     $found = false;
                     $permission = '';
                     foreach ($v['ngkProperties'] as $p) {
@@ -325,11 +327,11 @@ class Controller extends \Piwik\Plugin\Controller
             $v['ngkPrevious'] = $offset > 0 ? $this->link($logParams + ['offset' => max(0, $offset - 50)]) : '';
             $v['ngkNext'] = count($logs) > $offset + 50 ? $this->link($logParams + ['offset' => $offset + 50]) : '';
         } elseif ($section === 'settings') {
-            $v['ngkInfo'] = ['file' => (string) (Settings::all()['credentials_file'] ?? ''),
+            $v['ngkInfo'] = ['file' => Settings::credentialsFile($id),
                 'project' => '', 'email' => '', 'googleUrl' => 'https://console.cloud.google.com/apis/library/searchconsole.googleapis.com',
                 'connection' => $repo->connection($id, $v['ngkProperty'])];
             try {
-                $key = Settings::credentials();
+                $key = Settings::credentials($id);
                 $v['ngkInfo']['project'] = (string) ($key['project_id'] ?? '');
                 $v['ngkInfo']['email'] = (string) $key['client_email'];
                 $v['ngkInfo']['googleUrl'] .= '?' . http_build_query(['project' => $v['ngkInfo']['project']]);

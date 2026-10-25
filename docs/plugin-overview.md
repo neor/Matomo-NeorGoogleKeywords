@@ -56,7 +56,7 @@ Import data **automatically through Matomo's scheduler** or **manually when you 
 
 **Log** records import results and errors so administrators can investigate missing data. **Settings** shows connection and configuration information; connection settings are maintained in the server configuration.
 
-You can connect multiple Matomo websites to their corresponding Search Console properties. A search phrases widget is also available under **Referrers → Search Engines and Keywords**. The interface supports English, Russian, French, Spanish, Portuguese, German and Italian, and follows Matomo's language setting.
+You can connect multiple Matomo websites to their corresponding Search Console properties, using either a shared service account or a separate JSON key for each website. This lets you keep access to different clients' properties separate while managing reports in one Matomo installation. A search phrases widget is also available under **Referrers → Search Engines and Keywords**. The interface supports English, Russian, French, Spanish, Portuguese, German and Italian, and follows Matomo's language setting.
 
 ## Understand the numbers
 

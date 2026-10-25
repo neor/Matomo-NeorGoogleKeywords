@@ -2,6 +2,18 @@
 
 New entries are added at the top. The current version is specified in `plugin.json`; validation results and limitations are documented in [TESTING.md](TESTING.md).
 
+## 1.2.0 — 2026-10-25
+
+### Added
+
+- Per-website service account keys through `credentials_file_ID`, with the original `credentials_file` retained as a shared fallback.
+- Website-specific credentials for connection checks, settings, manual imports, CLI imports and scheduled imports.
+- Regression coverage for credential selection, invalid overrides and account isolation when reusing a Google client across websites.
+
+### Fixed
+
+- Corrected the README import command to `ngk:import`.
+
 ## 1.1.1 — 2026-10-23
 
 ### Added
