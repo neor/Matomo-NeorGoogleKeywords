@@ -1,0 +1,23 @@
+{
+  "name": "NeorGoogleKeywords",
+  "description": "Daily Google Search Console import and standalone search query reports. Service account authentication.",
+  "version": "1.1.1",
+  "license": "GPL v3+",
+  "keywords": [
+    "google",
+    "search console",
+    "keywords"
+  ],
+  "require": {
+    "piwik": ">=5.14.0,<6.0.0",
+    "php": ">=8.1.0"
+  },
+  "authors": [
+    {
+      "name": "Nikolay Lisienko | Neor Digital",
+      "email": "tere@neor.ee",
+      "homepage": "https://neor.digital/"
+    }
+  ],
+  "homepage": "https://github.com/neor/Matomo-NeorGoogleKeywords"
+}

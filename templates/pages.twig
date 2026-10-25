@@ -1,0 +1,77 @@
+<form method="get" action="index.php" class="ngk-filter ngk-card">
+    <input type="hidden" name="module" value="NeorGoogleKeywords"><input type="hidden" name="action" value="index"><input type="hidden" name="category" value="{{ ngkCategory|default('') }}"><input type="hidden" name="subcategory" value="{{ ngkSubcategory|default('') }}"><input type="hidden" name="section" value="pages"><input type="hidden" name="idSite" value="{{ ngkId }}">
+    <input type="hidden" name="sort" value="{{ ngkSort }}"><input type="hidden" name="direction" value="{{ ngkDirection }}">
+    <label>{{ 'NeorGoogleKeywords_From'|translate }} <input type="text" class="ngk-date-input" name="from" value="{{ ngkFrom|date('d-m-Y') }}" placeholder="{{ 'NeorGoogleKeywords_DateFormat'|translate }}" title="{{ 'NeorGoogleKeywords_DateFormatHint'|translate }}" pattern="[0-9]{2}-[0-9]{2}-[0-9]{4}" maxlength="10" required></label><label>{{ 'NeorGoogleKeywords_To'|translate }} <input type="text" class="ngk-date-input" name="to" value="{{ ngkTo|date('d-m-Y') }}" placeholder="{{ 'NeorGoogleKeywords_DateFormat'|translate }}" title="{{ 'NeorGoogleKeywords_DateFormatHint'|translate }}" pattern="[0-9]{2}-[0-9]{2}-[0-9]{4}" maxlength="10" required></label><button type="submit" class="btn ngk-button">{{ 'NeorGoogleKeywords_Show'|translate }}</button>
+    <nav class="ngk-quick-ranges" aria-label="{{ 'NeorGoogleKeywords_QuickRanges'|translate }}">
+        {% for range in ngkQuickRanges|default([]) %}
+            <a href="{{ range.url }}" class="ngk-range-link{% if range.active %} is-active{% endif %}"{% if range.active %} aria-current="page"{% endif %}>{{ range.label }}</a>
+        {% endfor %}
+    </nav>
+</form>
+{% if ngkTotals.days|default(0) > 0 %}
+    <div class="ngk-metrics">
+        <div class="ngk-metric"><span>{{ 'NeorGoogleKeywords_PropertyClicks'|translate }}</span><strong>{{ ngkTotals.clicks|number_format(0, ',', ' ') }}</strong></div>
+        <div class="ngk-metric"><span>{{ 'NeorGoogleKeywords_PropertyImpressions'|translate }}</span><strong>{{ ngkTotals.impressions|number_format(0, ',', ' ') }}</strong></div>
+        <div class="ngk-metric"><span>{{ 'NeorGoogleKeywords_PropertyCtr'|translate }}</span><strong>{{ ngkTotals.ctr|default(0)|number_format(2, ',', ' ') }}<small>%</small></strong></div>
+        <div class="ngk-metric"><span>{{ 'NeorGoogleKeywords_SavedDays'|translate }}</span><strong>{{ ngkTotals.days }}</strong></div>
+    </div>
+    <p class="ngk-muted">{{ 'NeorGoogleKeywords_ImportCoverage'|translate(ngkTotals.days, ngkExpectedDays, ngkTotals.imported_at) }}</p>
+    {% if ngkTotals.days < ngkExpectedDays %}<div class="ngk-notice">{{ 'NeorGoogleKeywords_PartialImport'|translate }}</div>{% endif %}
+    {% if ngkTotals.capped %}<div class="ngk-notice">{{ 'NeorGoogleKeywords_ApiLimitNotice'|translate }}</div>{% endif %}
+{% else %}<div class="ngk-notice">{{ 'NeorGoogleKeywords_NoImportedDays'|translate }}</div>{% endif %}
+<section class="ngk-card">
+    <div class="ngk-section-title">
+        <h3>{{ 'NeorGoogleKeywords_Pages'|translate }}</h3>
+        <span class="ngk-muted">{{ ngkFrom|date('d-m-Y') }} — {{ ngkTo|date('d-m-Y') }}</span>
+    </div>
+    <div class="ngk-table-scroll"><table class="dataTable ngk-table"><thead><tr>
+    {% for header in ngkHeaders|default([]) %}
+        <th scope="col" aria-sort="{{ header.aria }}"{% if header.key == 'clicks' %} style="width: 140px;"{% elseif header.key == 'label' %} style="width: 40%;"{% endif %}>
+            <a href="{{ header.url }}" title="{{ header.title }}">{{ header.label }} <span aria-hidden="true">{{ header.marker }}</span></a>
+        </th>
+    {% endfor %}
+    <th scope="col" style="text-align: left;">{{ 'NeorGoogleKeywords_Keywords'|translate }}</th>
+    </tr></thead><tbody>{% for row in ngkRows|default([]) %}
+    <tr>
+        <td>
+            <span class="ngk-query-links">
+                <a class="ngk-query-link" href="{{ row.page_url }}" target="_blank" rel="noopener noreferrer" title="{{ row.page_display|default(row.page_url) }}">{{ row.page_display|default(row.page_url) }}</a>
+                <a class="ngk-google-link" href="{{ row.page_url }}" target="_blank" rel="noopener noreferrer" title="{{ row.page_display|default(row.page_url) }}" aria-label="{{ row.page_display|default(row.page_url) }}"><span aria-hidden="true">↗</span></a>
+            </span>
+        </td>
+        <td>{{ row.clicks|number_format(0, ',', ' ') }}</td>
+        <td style="text-align: left;">
+            {% set queries = row.queries|default([]) %}
+            {% if queries|length > 0 %}
+                <div class="ngk-page-keywords">
+                    {% for kw in queries|slice(0, 5) %}
+                        <span class="ngk-keyword-chip">
+                            <a href="{{ kw.drill_url|default('index.php') }}" class="ngk-keyword-link" title="{{ kw.query_text }}">{{ kw.query_text }}</a>
+                            <span class="ngk-keyword-clicks{% if kw.clicks == 0 %} is-zero{% endif %}" title="{{ 'NeorGoogleKeywords_DayMetrics'|translate(kw.clicks|number_format(0, ',', ' '), kw.impressions|number_format(0, ',', ' ')) }}">{{ kw.clicks|number_format(0, ',', ' ') }}</span>
+                        </span>
+                    {% endfor %}
+                    {% if queries|length > 5 %}
+                        <details class="ngk-more-keywords">
+                            <summary>{{ 'NeorGoogleKeywords_MoreKeywords'|translate(queries|length - 5) }}</summary>
+                            <div class="ngk-keywords-expanded">
+                                {% for kw in queries|slice(5) %}
+                                    <span class="ngk-keyword-chip">
+                                        <a href="{{ kw.drill_url|default('index.php') }}" class="ngk-keyword-link" title="{{ kw.query_text }}">{{ kw.query_text }}</a>
+                                        <span class="ngk-keyword-clicks{% if kw.clicks == 0 %} is-zero{% endif %}" title="{{ 'NeorGoogleKeywords_DayMetrics'|translate(kw.clicks|number_format(0, ',', ' '), kw.impressions|number_format(0, ',', ' ')) }}">{{ kw.clicks|number_format(0, ',', ' ') }}</span>
+                                    </span>
+                                {% endfor %}
+                            </div>
+                        </details>
+                    {% endif %}
+                </div>
+            {% else %}
+                <span class="ngk-muted">—</span>
+            {% endif %}
+        </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="3" class="ngk-empty">{{ 'NeorGoogleKeywords_NoPages'|translate }}</td></tr>
+    {% endfor %}</tbody></table></div>
+    {% include '@NeorGoogleKeywords/pagination.twig' %}
+</section>
+<p class="ngk-muted">{{ 'NeorGoogleKeywords_PagesReportHelp'|translate }}</p>

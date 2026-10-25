@@ -1,0 +1,32 @@
+{% extends 'dashboard.twig' %}
+{% block topcontrols %}{% endblock %}
+{% block content %}
+<nav id="ngk-navigation" aria-label="Google Search Console">
+    <form method="get" action="index.php" class="ngk-site-form">
+        <input type="hidden" name="module" value="NeorGoogleKeywords"><input type="hidden" name="action" value="index">
+        <input type="hidden" name="category" value="{{ ngkCategory|default('') }}">
+        <input type="hidden" name="subcategory" value="{{ ngkSubcategory|default('') }}">
+        <input type="hidden" name="section" value="{{ ngkSection }}">
+        <input type="hidden" name="from" value="{{ ngkFrom }}"><input type="hidden" name="to" value="{{ ngkTo }}">
+        <input type="hidden" name="sort" value="{{ ngkSort }}"><input type="hidden" name="direction" value="{{ ngkDirection }}">
+        {% set isCurrentConfigured = ngkConfigured|default(false) or (ngkId in ngkConfiguredSites|default([])) %}
+        <label for="ngk-site-select" class="visually-hidden">{{ 'NeorGoogleKeywords_Site'|translate }}</label>
+        <div class="ngk-site-select-wrapper">
+            <select id="ngk-site-select" name="idSite" class="browser-default{% if isCurrentConfigured %} is-configured{% endif %}"{% if isCurrentConfigured %} style="color: var(--ngk-clicks, #1967d2);"{% endif %} onchange="this.form.submit()">{% for site in ngkSites %}{% set isSiteConfigured = site.configured|default(false) or (site.idsite in ngkConfiguredSites|default([])) %}<option value="{{ site.idsite }}"{% if site.idsite == ngkId %} selected{% endif %}{% if isSiteConfigured %} class="is-configured" style="color: var(--ngk-clicks, #1967d2);"{% else %} style="color: var(--ngk-text, #202a42);"{% endif %}>{{ site.name }} · {{ site.idsite }}</option>{% endfor %}</select>
+        </div>
+        <button type="submit" class="visually-hidden btn ngk-button">{{ 'NeorGoogleKeywords_Select'|translate }}</button>
+    </form>
+    {% for item in ngkNav %}<a href="{{ item.url }}" class="ngk-nav-link{% if item.key == ngkSection %} is-active{% endif %}"{% if item.key == ngkSection %} aria-current="page"{% endif %}>{{ item.label }}</a>{% endfor %}
+</nav>
+<div id="ngk-report" class="ngk-section-{{ ngkSection }}">
+    {% if ngkError %}<div class="ngk-notice is-error" role="alert">{{ ngkError }}</div>{% endif %}
+    {% if ngkMessage %}<div class="ngk-notice is-success" role="status">{{ ngkMessage }}</div>{% endif %}
+    {% if ngkSection == 'stream' %}{% include '@NeorGoogleKeywords/stream.twig' %}
+    {% elseif ngkSection == 'detail' %}{% include '@NeorGoogleKeywords/detail.twig' %}
+    {% elseif ngkSection == 'pages' %}{% include '@NeorGoogleKeywords/pages.twig' %}
+    {% elseif ngkSection == 'import' %}{% include '@NeorGoogleKeywords/import.twig' %}
+    {% elseif ngkSection == 'journal' %}{% include '@NeorGoogleKeywords/journal.twig' %}
+    {% elseif ngkSection == 'settings' %}{% include '@NeorGoogleKeywords/settings.twig' %}{% endif %}
+    <footer class="ngk-footer"><a href="https://search.google.com/search-console">Google Search Console</a><br>&copy; <a href="https://neor.digital">Neor Digital</a></footer>
+</div>
+{% endblock %}

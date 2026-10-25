@@ -1,0 +1,16 @@
+<div class="ngk-keywords-widget">
+    <p>{{ 'NeorGoogleKeywords_WidgetHelp'|translate }}</p>
+    {% if message %}<p role="status">{{ message }}</p>{% else %}
+        <p>{{ from|date('d-m-Y') }} — {{ to|date('d-m-Y') }} · {{ 'NeorGoogleKeywords_WidgetCoverage'|translate(days) }}</p>
+        <div class="ngk-keywords-scroll"><table class="dataTable">
+            <thead><tr><th scope="col">{{ 'NeorGoogleKeywords_Phrase'|translate }}</th><th scope="col">{{ 'NeorGoogleKeywords_Clicks'|translate }}</th><th scope="col">{{ 'NeorGoogleKeywords_Impressions'|translate }}</th><th scope="col">CTR</th><th scope="col">{{ 'NeorGoogleKeywords_Position'|translate }}</th></tr></thead>
+            <tbody>{% for row in rows %}<tr>
+                <td>{{ row.query_text }} <a href="https://www.google.com/search?q={{ row.query_text|url_encode }}&amp;ie=UTF-8" target="_blank" rel="noopener noreferrer" aria-label="{{ 'NeorGoogleKeywords_SearchGoogle'|translate(row.query_text) }}">↗</a></td>
+                <td>{{ row.clicks|number_format(0, ',', ' ') }}</td><td>{{ row.impressions|number_format(0, ',', ' ') }}</td>
+                <td>{{ row.ctr|default(0)|number_format(2, ',', ' ') }}%</td>
+                <td>{% if row.impressions > 0 %}{{ row.position|number_format(2, ',', ' ') }}{% else %}—{% endif %}</td>
+            </tr>{% else %}<tr><td colspan="5">{{ 'NeorGoogleKeywords_WidgetEmpty'|translate }}</td></tr>{% endfor %}</tbody>
+        </table></div>
+        <p>{{ 'NeorGoogleKeywords_First100'|translate }} <a href="{{ reportUrl }}">{{ 'NeorGoogleKeywords_FullReport'|translate }}</a></p>
+    {% endif %}
+</div>

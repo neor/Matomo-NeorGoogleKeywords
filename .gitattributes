@@ -1,0 +1,28 @@
+* text=auto
+*.php text eol=lf
+*.js text eol=lf
+*.css text eol=lf
+*.twig text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.png binary
+*.jpg binary
+VERSION text eol=lf
+
+# Keep repository tooling and local customization out of git archive releases.
+/.gitattributes export-ignore
+/.gitignore export-ignore
+/AGENTS.md export-ignore
+/scratch export-ignore
+/tmp export-ignore
+/todo.txt export-ignore
+/stylesheets/custom.css export-ignore
+/config export-ignore
+/credentials export-ignore
+/secrets export-ignore
+/.env export-ignore
+/.env.* export-ignore
+/credentials.json export-ignore
+/google-search-console.json export-ignore
+/vendor export-ignore
+/node_modules export-ignore

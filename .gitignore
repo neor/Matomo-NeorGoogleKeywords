@@ -1,0 +1,33 @@
+# Local credentials and configuration (never commit service-account keys).
+/.env
+/.env.*
+/config/
+/credentials/
+/secrets/
+/credentials.json
+/google-search-console.json
+*.pem
+*.key
+*.p12
+*.pfx
+
+# User-owned stylesheet; optional and loaded automatically when present.
+/stylesheets/custom.css
+
+# Development output and local notes.
+/AGENTS.md
+/scratch/
+/tmp/
+/todo.txt
+*.zip
+*.log
+*.tmp
+/vendor/
+/node_modules/
+/.idea/
+/.vscode/
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~

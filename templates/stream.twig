@@ -1,0 +1,86 @@
+<section aria-label="{{ 'NeorGoogleKeywords_AllPeriodStats'|translate }}">
+    <div class="ngk-section-title"><h3>{{ 'NeorGoogleKeywords_AllPeriod'|translate }}</h3><span class="ngk-muted">{% if ngkAll.days|default(0) %}{{ ngkAll.first_date }} — {{ ngkAll.last_date }} · {{ 'NeorGoogleKeywords_ImportedDayCount'|translate(ngkAll.days) }}{% else %}{{ 'NeorGoogleKeywords_NoHistory'|translate }}{% endif %}</span></div>
+    <div class="ngk-metrics">
+        <div class="ngk-metric"><span>{{ 'NeorGoogleKeywords_Clicks'|translate }}</span><strong>{{ ngkAll.clicks|default(0)|number_format(0, ',', ' ') }}</strong></div>
+        <div class="ngk-metric"><span>{{ 'NeorGoogleKeywords_Impressions'|translate }}</span><strong>{{ ngkAll.impressions|default(0)|number_format(0, ',', ' ') }}</strong></div>
+        <div class="ngk-metric"><span>CTR</span><strong>{{ ngkAll.ctr|default(0)|number_format(2, ',', ' ') }}<small>%</small></strong></div>
+        <div class="ngk-metric"><span>{{ 'NeorGoogleKeywords_AveragePosition'|translate }}</span><strong>{% if ngkAll.impressions|default(0) > 0 %}{{ ngkAll.position|number_format(2, ',', ' ') }}{% else %}—{% endif %}</strong></div>
+    </div>
+    <p class="ngk-muted">{{ 'NeorGoogleKeywords_SavedDaysHelp'|translate }} {% if ngkAll.imported_at|default('') %}{{ 'NeorGoogleKeywords_Updated'|translate(ngkAll.imported_at) }}{% endif %}</p>
+</section>
+<section class="ngk-card">
+    <div class="ngk-section-title"><h3>{{ 'NeorGoogleKeywords_TwoMonthTrend'|translate }}</h3><span class="ngk-muted">{{ ngkRanges.chartFrom }} — {{ ngkRanges.end }}</span></div>
+    <p class="ngk-muted">{{ 'NeorGoogleKeywords_ChartAxesHelp'|translate }}</p>
+    {% if ngkCharts|length == 2 %}
+    {% set clicks = ngkCharts[0] %}{% set impressions = ngkCharts[1] %}
+    <div class="ngk-combined-legend">
+        <span><i class="ngk-dot clicks" aria-hidden="true"></i><strong>{{ 'NeorGoogleKeywords_Clicks'|translate }}</strong> {{ clicks.sum|number_format(0, ',', ' ') }} <small>· {{ 'NeorGoogleKeywords_LeftAxis'|translate }}</small></span>
+        <span><i class="ngk-dot impressions" aria-hidden="true"></i><strong>{{ 'NeorGoogleKeywords_Impressions'|translate }}</strong> {{ impressions.sum|number_format(0, ',', ' ') }} <small>· {{ 'NeorGoogleKeywords_RightAxis'|translate }}</small></span>
+    </div>
+    <div class="ngk-chart-scroll">
+    <svg class="ngk-chart ngk-combined-chart" viewBox="0 0 1040 295" role="img" aria-labelledby="ngk-combined-title">
+        <title id="ngk-combined-title">{{ 'NeorGoogleKeywords_ChartDescription'|translate(ngkRanges.chartFrom, ngkRanges.end) }}</title>
+        <line x1="75" y1="50" x2="935" y2="50" class="ngk-grid"/><line x1="75" y1="150" x2="935" y2="150" class="ngk-grid"/><line x1="75" y1="250" x2="935" y2="250" class="ngk-grid"/>
+        <g class="ngk-axis-clicks">
+            <text x="75" y="22">{{ 'NeorGoogleKeywords_Clicks'|translate }}</text>
+            <text x="66" y="54" text-anchor="end">{{ clicks.max|number_format(0, ',', ' ') }}</text><text x="66" y="154" text-anchor="end">{{ clicks.half|number_format(1, ',', ' ') }}</text><text x="66" y="254" text-anchor="end">0</text>
+        </g>
+        <g class="ngk-axis-impressions">
+            <text x="935" y="22" text-anchor="end">{{ 'NeorGoogleKeywords_Impressions'|translate }}</text>
+            <text x="944" y="54">{{ impressions.max|number_format(0, ',', ' ') }}</text><text x="944" y="154">{{ impressions.half|number_format(1, ',', ' ') }}</text><text x="944" y="254">0</text>
+        </g>
+        {% set step = 860 / max(1, clicks.bars|length - 1) %}
+        {% set clicksPath = '' %}{% set impressionsPath = '' %}{% set connected = false %}
+        {% for point in clicks.bars %}
+            {% set x = clicks.bars|length == 1 ? 505 : 75 + loop.index0 * step %}
+            {% if point.date|date('w', 'UTC') == '0' %}
+                <line class="ngk-sunday-guide" x1="{{ x }}" x2="{{ x }}" y1="50" y2="250"><title>{{ 'NeorGoogleKeywords_SundayDate'|translate(point.date) }}</title></line>
+            {% endif %}
+            {% if point.imported %}
+                {% set command = connected ? ' L' : ' M' %}
+                {% set clicksPath = clicksPath ~ command ~ x|round(3) ~ ',' ~ (250 - point.height * 1.6)|round(3) %}
+                {% set impressionsPath = impressionsPath ~ command ~ x|round(3) ~ ',' ~ (250 - impressions.bars[loop.index0].height * 1.6)|round(3) %}
+            {% endif %}
+            {% set connected = point.imported %}
+        {% endfor %}
+        {% if clicksPath %}
+            <path class="ngk-series-line ngk-clicks-line" d="{{ clicksPath }}"/>
+            <path class="ngk-series-line ngk-impressions-line" d="{{ impressionsPath }}"/>
+        {% endif %}
+        {% set weekdays = [('NeorGoogleKeywords_WeekdaySunday'|translate), ('NeorGoogleKeywords_WeekdayMonday'|translate), ('NeorGoogleKeywords_WeekdayTuesday'|translate), ('NeorGoogleKeywords_WeekdayWednesday'|translate), ('NeorGoogleKeywords_WeekdayThursday'|translate), ('NeorGoogleKeywords_WeekdayFriday'|translate), ('NeorGoogleKeywords_WeekdaySaturday'|translate)] %}
+        {% for bar in clicks.bars %}
+            {% set dayLabel = bar.date ~ ' ' ~ weekdays[bar.date|date('w', 'UTC')] %}
+            {% set other = impressions.bars[loop.index0] %}
+            {% set x = clicks.bars|length == 1 ? 505 : 75 + loop.index0 * step %}
+            {% set left = max(75, x - step / 2) %}
+            <a href="{{ bar.url }}" class="ngk-chart-day" aria-label="{{ dayLabel }}: {% if bar.imported %}{{ 'NeorGoogleKeywords_DayMetrics'|translate(bar.clicks|number_format(0, ',', ' '), bar.impressions|number_format(0, ',', ' ')) }}{% else %}{{ 'NeorGoogleKeywords_DayNotImported'|translate }}{% endif %}"><title>{{ dayLabel }}: {% if bar.imported %}{{ 'NeorGoogleKeywords_DayMetrics'|translate(bar.clicks|number_format(0, ',', ' '), bar.impressions|number_format(0, ',', ' ')) }}{% else %}{{ 'NeorGoogleKeywords_DayNotImported'|translate }}{% endif %}</title>
+                <rect class="ngk-day-hit" x="{{ left }}" y="45" width="{{ min(935, x + step / 2) - left }}" height="210"/>
+                <line class="ngk-day-guide" x1="{{ x }}" x2="{{ x }}" y1="50" y2="250"/>
+                {% if bar.imported %}
+                    <circle class="ngk-point ngk-clicks-point" cx="{{ x }}" cy="{{ 250 - bar.height * 1.6 }}" r="2"/>
+                    <circle class="ngk-point ngk-impressions-point" cx="{{ x }}" cy="{{ 250 - other.height * 1.6 }}" r="2"/>
+                {% else %}
+                    <line class="ngk-missing-day" x1="{{ x }}" x2="{{ x }}" y1="250" y2="256"/>
+                {% endif %}
+            </a>
+            {% if loop.index0 % 7 == 0 or loop.last %}<text x="{{ x }}" y="278" text-anchor="middle">{{ bar.label }}</text>{% endif %}
+        {% endfor %}
+    </svg>
+    </div>
+    {% endif %}
+    <p class="ngk-muted">{{ 'NeorGoogleKeywords_ChartGapsHelp'|translate }}</p>
+    <details class="ngk-data-details"><summary>{{ 'NeorGoogleKeywords_ChartData'|translate }}</summary><div class="ngk-table-scroll"><table class="dataTable ngk-table"><thead><tr><th>{{ 'NeorGoogleKeywords_Date'|translate }}</th><th>{{ 'NeorGoogleKeywords_Clicks'|translate }}</th><th>{{ 'NeorGoogleKeywords_Impressions'|translate }}</th><th>{{ 'NeorGoogleKeywords_Status'|translate }}</th></tr></thead><tbody>
+        {% for day in ngkDays %}<tr><td><a href="{{ day.url }}">{{ day.date }}</a></td><td>{{ day.imported ? day.clicks|number_format(0, ',', ' ') : '—' }}</td><td>{{ day.imported ? day.impressions|number_format(0, ',', ' ') : '—' }}</td><td>{{ day.imported ? ('NeorGoogleKeywords_Imported'|translate) : ('NeorGoogleKeywords_NotImported'|translate) }}</td></tr>{% endfor %}
+    </tbody></table></div></details>
+</section>
+<div class="ngk-top-grid">
+{% for top in ngkTop %}<section class="ngk-card" id="ngk-top-{{ top.key }}">
+    <h3>{{ top.title }}</h3><p class="ngk-muted">{{ top.from }} — {{ top.to }} · {{ 'NeorGoogleKeywords_ImportedDays'|translate(top.coverage.days) }}<br>{{ 'NeorGoogleKeywords_Top20Help'|translate }}</p>
+    <div class="ngk-table-scroll"><table class="dataTable ngk-table"><thead><tr>
+    {% for header in top.headers %}<th scope="col" aria-sort="{{ header.aria }}"><a href="{{ header.url }}" title="{{ header.title }}">{{ header.label }} <span aria-hidden="true">{{ header.marker }}</span></a></th>{% endfor %}
+    </tr></thead><tbody>
+    {% for row in top.rows %}<tr><td><span class="ngk-query-links"><a class="ngk-query-link" href="{{ row.url }}">{{ row.query_text }}</a><a class="ngk-google-link" href="{{ row.google_url }}" target="_blank" rel="noopener noreferrer" title="{{ 'NeorGoogleKeywords_SearchGoogle'|translate(row.query_text) }}" aria-label="{{ 'NeorGoogleKeywords_SearchGoogle'|translate(row.query_text) }}"><span aria-hidden="true">↗</span></a></span></td><td>{{ row.clicks|number_format(0, ',', ' ') }}</td><td>{{ row.impressions|number_format(0, ',', ' ') }}</td></tr>{% else %}<tr><td colspan="3" class="ngk-empty">{{ 'NeorGoogleKeywords_NoQueriesForPeriod'|translate }}</td></tr>{% endfor %}
+    </tbody></table></div>
+</section>{% endfor %}
+</div>
+<p class="ngk-muted">{{ 'NeorGoogleKeywords_RollingPeriodsHelp'|translate }}</p>
